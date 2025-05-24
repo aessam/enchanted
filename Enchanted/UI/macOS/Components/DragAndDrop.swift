@@ -16,7 +16,7 @@ struct DragAndDrop: View {
             
             HStack(spacing: 8) {
                 Image(systemName: "photo")
-                    .font(.system(size: 25))
+                    .scaledFont(size: 25)
                 Text("Drop your image here")
                     .font(.title2)
             }

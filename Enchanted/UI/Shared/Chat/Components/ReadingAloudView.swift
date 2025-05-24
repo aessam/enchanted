@@ -20,13 +20,13 @@ struct ReadingAloudView: View {
                 .frame(width: 18)
             
             Text("Reading Aloud")
-                .font(.system(size: 14))
+                .scaledFont(size: 14)
             
             Spacer()
             
             Button(action: onStopTap) {
                 Image(systemName: "stop.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(size: 15, weight: .semibold)
                     .padding(5)
             }
             .buttonStyle(GrowingButton())

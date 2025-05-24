@@ -18,7 +18,7 @@ struct UnreachableAPIView: View {
                     .lineLimit(nil)
                     .minimumScaleFactor(0.5)
                     .fontWeight(.medium)
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
             }
             
             Spacer()

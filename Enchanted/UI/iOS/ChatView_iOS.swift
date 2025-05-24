@@ -144,7 +144,7 @@ struct ChatView: View {
                 TextField("Message", text: $message, axis: .vertical)
                     .focused($isFocusedInput)
                     .frame(minHeight: 40)
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
                 
                 RecordingView(speechRecognizer: speechRecognizer, isRecording: $isRecording.animation()) { transcription in
                     self.message = transcription

@@ -48,7 +48,7 @@ struct ConversationHistoryList: View {
                 
                 HStack {
                     Text(conversationGroup.date.daysAgoString())
-                        .font(.system(size: 14))
+                        .scaledFont(size: 14)
                         .fontWeight(.semibold)
                         .foregroundColor(Color(.systemGray))
                     
@@ -71,7 +71,7 @@ struct ConversationHistoryList: View {
                             
                             Text(dailyConversation.name)
                                 .lineLimit(1)
-                                .font(.system(size: 16))
+                                .scaledFont(size: 16)
                                 .foregroundColor(Color(.label))
                                 .animation(.easeOut(duration: 0.15))
                                 .transition(.opacity)

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EmptyConversaitonView: View, KeyboardReadable {
     @Environment(\.openURL) private var openURL
+    @Environment(\.fontScale) private var fontScale
     @State var showPromptsAnimation = false
     @State var prompts: [SamplePrompts] = []
     var sendPrompt: (String) -> ()
@@ -37,7 +38,7 @@ struct EmptyConversaitonView: View, KeyboardReadable {
             VStack(spacing: 25) {
                 VStack(alignment: .center) {
                     Text("Enchanted")
-                        .font(Font.system(size: 46, weight: .thin))
+                        .font(Font.system(size: 46 * fontScale, weight: .thin))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(
                             LinearGradient(
@@ -70,7 +71,7 @@ struct EmptyConversaitonView: View, KeyboardReadable {
                         }) {
                             VStack(alignment: .leading) {
                                 Text(prompts[index].prompt)
-                                    .font(.system(size: 15))
+                                    .scaledFont(size: 15)
                                 Spacer()
                                 
                                 HStack {

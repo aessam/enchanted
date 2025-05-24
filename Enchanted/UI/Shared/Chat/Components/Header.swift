@@ -23,7 +23,7 @@ struct Header: View {
                 Spacer()
                 
                 Text(selectedModel.name)
-                    .font(.system(size: 15))
+                    .scaledFont(size: 15)
                     .fontWeight(.medium)
                 
                 Spacer()
