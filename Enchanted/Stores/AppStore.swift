@@ -25,6 +25,7 @@ final class AppStore {
     @MainActor var notifications: [NotificationMessage] = []
     @MainActor var menuBarIcon: String? = nil
     var appState: AppState = .chat
+    var fontFamily: AppFontFamily = .system
 
     init() {
         if let storedIntervalString = UserDefaults.standard.string(forKey: "pingInterval") {
@@ -34,6 +35,12 @@ final class AppStore {
                 pingInterval = .infinity
             }
         }
+        
+        if let fontFamilyRawValue = UserDefaults.standard.string(forKey: "fontFamily"),
+           let storedFontFamily = AppFontFamily(rawValue: fontFamilyRawValue) {
+            fontFamily = storedFontFamily
+        }
+        
         startCheckingReachability(interval: pingInterval)
     }
     

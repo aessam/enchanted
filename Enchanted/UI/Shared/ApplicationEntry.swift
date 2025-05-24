@@ -10,6 +10,7 @@ import SwiftData
 
 struct ApplicationEntry: View {
     @AppStorage("colorScheme") private var colorScheme: AppColorScheme = .system
+    @AppStorage("fontFamily") private var fontFamily: AppFontFamily = .system
     @State private var languageModelStore = LanguageModelStore.shared
     @State private var conversationStore = ConversationStore.shared
     @State private var completionsStore = CompletionsStore.shared

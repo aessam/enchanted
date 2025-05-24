@@ -4,9 +4,10 @@
 //
 //  Created by Augustinas Malinauskas on 13/05/2024.
 //
-
 import SwiftUI
+import Foundation
 import MarkdownUI
+@_exported import struct Enchanted.AppFontFamily
 
 struct MarkdownColours {
     static let text = Color(
@@ -36,140 +37,174 @@ struct MarkdownColours {
     static let checkbox = Color(rgba: 0xb9b9_bbff)
     static let checkboxBackground = Color(rgba: 0xeeee_efff)
     
-    static let enchantedTheme = Theme()
-        .text {
-            FontSize(14)
-        }
-        .code {
-            FontFamilyVariant(.monospaced)
-            FontSize(.em(0.85))
-            BackgroundColor(secondaryBackground)
-        }
-        .strong {
-            FontWeight(.semibold)
-        }
-        .link {
-            ForegroundColor(link)
-        }
-        .heading1 { configuration in
-            VStack(alignment: .leading, spacing: 0) {
+    static func enchantedTheme(fontFamily: AppFontFamily = .system) -> Theme {
+        return Theme()
+            .text {
+                FontSize(14)
+                if let fontName = fontFamily.fontName {
+                    FontFamily([fontName])
+                }
+            }
+            .code {
+                FontFamilyVariant(.monospaced)
+                FontSize(.em(0.85))
+                BackgroundColor(secondaryBackground)
+            }
+            .strong {
+                FontWeight(.semibold)
+            }
+            .link {
+                ForegroundColor(link)
+            }
+            .heading1 { configuration in
+                VStack(alignment: .leading, spacing: 0) {
+                    configuration.label
+                        .relativePadding(.bottom, length: .em(0.3))
+                        .relativeLineSpacing(.em(0.125))
+                        .markdownMargin(top: 24, bottom: 16)
+                        .markdownTextStyle {
+                            FontWeight(.semibold)
+                            FontSize(.em(2))
+                            if let fontName = fontFamily.fontName {
+                                FontFamily([fontName])
+                            }
+                        }
+                    Divider().overlay(divider)
+                }
+            }
+            .heading2 { configuration in
+                VStack(alignment: .leading, spacing: 0) {
+                    configuration.label
+                        .relativePadding(.bottom, length: .em(0.3))
+                        .relativeLineSpacing(.em(0.125))
+                        .markdownMargin(top: 24, bottom: 16)
+                        .markdownTextStyle {
+                            FontWeight(.semibold)
+                            FontSize(.em(1.5))
+                            if let fontName = fontFamily.fontName {
+                                FontFamily([fontName])
+                            }
+                        }
+                    Divider().overlay(divider)
+                }
+            }
+            .heading3 { configuration in
                 configuration.label
-                    .relativePadding(.bottom, length: .em(0.3))
                     .relativeLineSpacing(.em(0.125))
                     .markdownMargin(top: 24, bottom: 16)
                     .markdownTextStyle {
                         FontWeight(.semibold)
-                        FontSize(.em(2))
+                        FontSize(.em(1.25))
+                        if let fontName = fontFamily.fontName {
+                            FontFamily([fontName])
+                        }
                     }
-                Divider().overlay(divider)
             }
-        }
-        .heading2 { configuration in
-            VStack(alignment: .leading, spacing: 0) {
+            .heading4 { configuration in
                 configuration.label
-                    .relativePadding(.bottom, length: .em(0.3))
                     .relativeLineSpacing(.em(0.125))
                     .markdownMargin(top: 24, bottom: 16)
                     .markdownTextStyle {
                         FontWeight(.semibold)
-                        FontSize(.em(1.5))
+                        if let fontName = fontFamily.fontName {
+                            FontFamily([fontName])
+                        }
                     }
-                Divider().overlay(divider)
             }
-        }
-        .heading3 { configuration in
-            configuration.label
-                .relativeLineSpacing(.em(0.125))
-                .markdownMargin(top: 24, bottom: 16)
-                .markdownTextStyle {
-                    FontWeight(.semibold)
-                    FontSize(.em(1.25))
-                }
-        }
-        .heading4 { configuration in
-            configuration.label
-                .relativeLineSpacing(.em(0.125))
-                .markdownMargin(top: 24, bottom: 16)
-                .markdownTextStyle {
-                    FontWeight(.semibold)
-                }
-        }
-        .heading5 { configuration in
-            configuration.label
-                .relativeLineSpacing(.em(0.125))
-                .markdownMargin(top: 24, bottom: 16)
-                .markdownTextStyle {
-                    FontWeight(.semibold)
-                    FontSize(.em(0.875))
-                }
-        }
-        .heading6 { configuration in
-            configuration.label
-                .relativeLineSpacing(.em(0.125))
-                .markdownMargin(top: 24, bottom: 16)
-                .markdownTextStyle {
-                    FontWeight(.semibold)
-                    FontSize(.em(0.85))
-                    ForegroundColor(tertiaryText)
-                }
-        }
-        .paragraph { configuration in
-            configuration.label
-                .fixedSize(horizontal: false, vertical: true)
-                .relativeLineSpacing(.em(0.25))
-                .markdownMargin(top: 0, bottom: 16)
-        }
-        .blockquote { configuration in
-            HStack(spacing: 0) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(border)
-                    .relativeFrame(width: .em(0.2))
+            .heading5 { configuration in
                 configuration.label
-                    .markdownTextStyle { ForegroundColor(secondaryText) }
-                    .relativePadding(.horizontal, length: .em(1))
-            }
-            .fixedSize(horizontal: false, vertical: true)
-        }
-        .codeBlock { configuration in
-            CodeBlockView(configuration: configuration)
-        }
-        .listItem { configuration in
-            configuration.label
-                .padding(.bottom, 10)
-        }
-        .taskListMarker { configuration in
-            Image(systemName: configuration.isCompleted ? "checkmark.square.fill" : "square")
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(checkbox, checkboxBackground)
-                .imageScale(.small)
-                .relativeFrame(minWidth: .em(1.5), alignment: .trailing)
-        }
-        .table { configuration in
-            configuration.label
-                .fixedSize(horizontal: false, vertical: true)
-                .markdownTableBorderStyle(.init(color: border))
-                .markdownTableBackgroundStyle(
-                    .alternatingRows(background, secondaryBackground)
-                )
-                .markdownMargin(top: 0, bottom: 16)
-        }
-        .tableCell { configuration in
-            configuration.label
-                .markdownTextStyle {
-                    if configuration.row == 0 {
+                    .relativeLineSpacing(.em(0.125))
+                    .markdownMargin(top: 24, bottom: 16)
+                    .markdownTextStyle {
                         FontWeight(.semibold)
+                        FontSize(.em(0.875))
+                        if let fontName = fontFamily.fontName {
+                            FontFamily([fontName])
+                        }
                     }
-                    BackgroundColor(nil)
+            }
+            .heading6 { configuration in
+                configuration.label
+                    .relativeLineSpacing(.em(0.125))
+                    .markdownMargin(top: 24, bottom: 16)
+                    .markdownTextStyle {
+                        FontWeight(.semibold)
+                        FontSize(.em(0.85))
+                        ForegroundColor(tertiaryText)
+                        if let fontName = fontFamily.fontName {
+                            FontFamily([fontName])
+                        }
+                    }
+            }
+            .paragraph { configuration in
+                configuration.label
+                    .fixedSize(horizontal: false, vertical: true)
+                    .relativeLineSpacing(.em(0.25))
+                    .markdownMargin(top: 0, bottom: 16)
+            }
+            .blockquote { configuration in
+                HStack(spacing: 0) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(border)
+                        .relativeFrame(width: .em(0.2))
+                    configuration.label
+                        .markdownTextStyle { 
+                            ForegroundColor(secondaryText)
+                            if let fontName = fontFamily.fontName {
+                                FontFamily([fontName])
+                            }
+                        }
+                        .relativePadding(.horizontal, length: .em(1))
                 }
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.vertical, 6)
-                .padding(.horizontal, 13)
-                .relativeLineSpacing(.em(0.25))
-        }
-        .thematicBreak {
-            Divider()
-                .relativeFrame(height: .em(0.25))
-                .overlay(border)
-                .markdownMargin(top: 24, bottom: 24)
-        }
+            }
+            .codeBlock { configuration in
+                CodeBlockView(configuration: configuration)
+            }
+            .listItem { configuration in
+                configuration.label
+                    .padding(.bottom, 10)
+            }
+            .taskListMarker { configuration in
+                Image(systemName: configuration.isCompleted ? "checkmark.square.fill" : "square")
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(checkbox, checkboxBackground)
+                    .imageScale(.small)
+                    .relativeFrame(minWidth: .em(1.5), alignment: .trailing)
+            }
+            .table { configuration in
+                configuration.label
+                    .fixedSize(horizontal: false, vertical: true)
+                    .markdownTableBorderStyle(.init(color: border))
+                    .markdownTableBackgroundStyle(
+                        .alternatingRows(background, secondaryBackground)
+                    )
+                    .markdownMargin(top: 0, bottom: 16)
+            }
+            .tableCell { configuration in
+                configuration.label
+                    .markdownTextStyle {
+                        if configuration.row == 0 {
+                            FontWeight(.semibold)
+                        }
+                        BackgroundColor(nil)
+                        if let fontName = fontFamily.fontName {
+                            FontFamily([fontName])
+                        }
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 13)
+                    .relativeLineSpacing(.em(0.25))
+            }
+            .thematicBreak {
+                Divider()
+                    .relativeFrame(height: .em(0.25))
+                    .overlay(border)
+                    .markdownMargin(top: 24, bottom: 24)
+            }
+    }
+    
+    static let enchantedTheme = enchantedTheme()
+}
 }

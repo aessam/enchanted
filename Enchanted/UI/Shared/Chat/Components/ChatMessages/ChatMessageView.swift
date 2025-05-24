@@ -20,6 +20,7 @@ struct ChatMessageView: View {
     @State private var mouseHover = false
     @State private var isSpeaking = false
     @State private var showThink = false
+    @State private var appStore = AppStore.shared
     
     var roleName: String  {
         let userInitialsNotEmpty = userInitials != "" ? userInitials : "AM"
@@ -73,7 +74,7 @@ struct ChatMessageView: View {
                                         .textSelection(.enabled)
 #endif
                                         .markdownCodeSyntaxHighlighter(.splash(theme: codeHighlightColorScheme))
-                                        .markdownTheme(MarkdownColours.enchantedTheme)
+                                        .markdownTheme(MarkdownColours.enchantedTheme(fontFamily: appStore.fontFamily))
                                 }
                             } else {
                                 if message.thinkComplete {
@@ -94,7 +95,7 @@ struct ChatMessageView: View {
                             .textSelection(.enabled)
     #endif
                             .markdownCodeSyntaxHighlighter(.splash(theme: codeHighlightColorScheme))
-                            .markdownTheme(MarkdownColours.enchantedTheme)
+                            .markdownTheme(MarkdownColours.enchantedTheme(fontFamily: appStore.fontFamily))
                     }
                     
                     if let uiImage = image {
