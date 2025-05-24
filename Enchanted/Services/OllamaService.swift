@@ -62,7 +62,7 @@ class OllamaService: @unchecked Sendable {
         
         // Create a custom request structure that includes tools
         var request = OKChatRequestData(model: model, messages: messages)
-        request.options = OKCompletionOptions(temperature: temperature)
+        request.options = OKCompletionOptions(temperature: Float(temperature))
         
         // Since OllamaKit might not support tools directly, we'll add tool definitions
         // to the system message to enable function calling via prompt engineering
@@ -86,9 +86,9 @@ class OllamaService: @unchecked Sendable {
             )
         }
         
-        let toolRequest = OKChatRequestData(model: model, messages: modifiedMessages)
+        var toolRequest = OKChatRequestData(model: model, messages: modifiedMessages)
         var options = OKCompletionOptions()
-        options.temperature = temperature
+        options.temperature = Float(temperature)
         toolRequest.options = options
         
         return ollamaKit.chat(data: toolRequest)
