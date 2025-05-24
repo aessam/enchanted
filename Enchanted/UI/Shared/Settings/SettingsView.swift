@@ -14,6 +14,7 @@ struct SettingsView: View {
     @Binding var systemPrompt: String
     @Binding var vibrations: Bool
     @Binding var colorScheme: AppColorScheme
+    @Binding var fontFamily: AppFontFamily
     @Binding var defaultOllamModel: String
     @Binding var ollamaBearerToken: String
     @Binding var appUserInitials: String
@@ -131,6 +132,15 @@ struct SettingsView: View {
                             .foregroundStyle(Color.label)
                     }
                     
+                    Picker(selection: $fontFamily) {
+                        ForEach(AppFontFamily.allCases, id:\.self) { font in
+                            Text(font.displayName).tag(font.id)
+                        }
+                    } label: {
+                        Label("Font Family", systemImage: "textformat")
+                            .foregroundStyle(Color.label)
+                    }
+                    
                     Picker(selection: $voiceIdentifier) {
                         ForEach(voices, id:\.self.identifier) { voice in
                             Text(voice.prettyName).tag(voice.identifier)
@@ -204,6 +214,7 @@ struct SettingsView: View {
         systemPrompt: .constant("You are an intelligent assistant solving complex problems. You are an intelligent assistant solving complex problems. You are an intelligent assistant solving complex problems."),
         vibrations: .constant(true),
         colorScheme: .constant(.light),
+        fontFamily: .constant(.system),
         defaultOllamModel: .constant("llama2"),
         ollamaBearerToken: .constant("x"),
         appUserInitials: .constant("AM"),
