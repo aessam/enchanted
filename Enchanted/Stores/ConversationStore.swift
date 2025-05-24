@@ -17,6 +17,8 @@ final class ConversationStore: Sendable {
     
     private var swiftDataService: SwiftDataService
     private var generation: AnyCancellable?
+    private var pendingToolCalls: [ToolCall] = []
+    private var toolCallsEnabled: Bool = true
     
     /// For some reason (SwiftUI bug / too frequent UI updates) updating UI for each stream message sometimes freezes the UI.
     /// Throttling UI updates seem to fix the issue.
@@ -34,6 +36,16 @@ final class ConversationStore: Sendable {
     
     init(swiftDataService: SwiftDataService) {
         self.swiftDataService = swiftDataService
+        // Load tool calling setting from UserDefaults (default to true if not set)
+        if UserDefaults.standard.object(forKey: "toolCallingEnabled") == nil {
+            UserDefaults.standard.set(true, forKey: "toolCallingEnabled")
+        }
+        self.toolCallsEnabled = UserDefaults.standard.bool(forKey: "toolCallingEnabled")
+    }
+    
+    @MainActor
+    func toggleToolCalling(_ enabled: Bool) {
+        toolCallsEnabled = enabled
     }
     
     func loadConversations() async throws {
@@ -165,10 +177,15 @@ final class ConversationStore: Sendable {
             
             if await OllamaService.shared.ollamaKit.reachable() {
                 DispatchQueue.global(qos: .background).async {
-                    var request = OKChatRequestData(model: model.name, messages: messageHistory)
-                    request.options = OKCompletionOptions(temperature: 0)
-                    
-                    self.generation = OllamaService.shared.ollamaKit.chat(data: request)
+                    if self.toolCallsEnabled {
+                        // Use tool calling
+                        let tools = ToolCallService.shared.getAvailableTools()
+                        self.generation = OllamaService.shared.chatWithTools(
+                            model: model.name,
+                            messages: messageHistory,
+                            tools: tools,
+                            temperature: 0
+                        )
                         .sink(receiveCompletion: { [weak self] completion in
                             switch completion {
                             case .finished:
@@ -177,9 +194,25 @@ final class ConversationStore: Sendable {
                                 self?.handleError(error.localizedDescription)
                             }
                         }, receiveValue: { [weak self] response in
-                            self?.handleReceive(response)
+                            self?.handleReceiveWithTools(response)
                         })
-                    
+                    } else {
+                        // Use regular chat without tools
+                        var request = OKChatRequestData(model: model.name, messages: messageHistory)
+                        request.options = OKCompletionOptions(temperature: 0)
+                        
+                        self.generation = OllamaService.shared.ollamaKit.chat(data: request)
+                            .sink(receiveCompletion: { [weak self] completion in
+                                switch completion {
+                                case .finished:
+                                    self?.handleComplete()
+                                case .failure(let error):
+                                    self?.handleError(error.localizedDescription)
+                                }
+                            }, receiveValue: { [weak self] response in
+                                self?.handleReceive(response)
+                            })
+                    }
                 }
             } else {
                 self.handleError("Server unreachable")
@@ -200,6 +233,129 @@ final class ConversationStore: Sendable {
                 self.messages[lastIndex].content.append(currentMessageBuffer)
                 currentMessageBuffer = ""
             }
+        }
+    }
+    
+    @MainActor
+    private func handleReceiveWithTools(_ response: OKChatResponse) {
+        if messages.isEmpty { return }
+        
+        if let responseContent = response.message?.content {
+            currentMessageBuffer = currentMessageBuffer + responseContent
+            
+            throttler.throttle { [weak self] in
+                guard let self = self else { return }
+                let lastIndex = self.messages.count - 1
+                self.messages[lastIndex].content.append(currentMessageBuffer)
+                currentMessageBuffer = ""
+                
+                // Check if the response is complete (indicated by response.done)
+                if response.done {
+                    self.processToolCallsIfPresent()
+                }
+            }
+        }
+    }
+    
+    @MainActor
+    private func processToolCallsIfPresent() {
+        guard let lastMessage = messages.last else { return }
+        
+        let parsedResponse = ToolCallParser.shared.parseResponse(lastMessage.content)
+        
+        if parsedResponse.hasToolCalls {
+            // Store the original content and tool calls
+            pendingToolCalls = parsedResponse.toolCalls
+            
+            // Update the message content to remove tool call JSON
+            lastMessage.content = parsedResponse.content
+            
+            // Execute tool calls
+            Task {
+                await executeToolCalls(parsedResponse.toolCalls)
+            }
+        }
+    }
+    
+    private func executeToolCalls(_ toolCalls: [ToolCall]) async {
+        var toolResults: [ToolCallResult] = []
+        
+        // Execute all tool calls
+        for toolCall in toolCalls {
+            let result = await ToolCallService.shared.executeToolCall(toolCall)
+            toolResults.append(result)
+        }
+        
+        // Create a tool result message to send back to the model
+        let toolResultsMessage = createToolResultsMessage(toolResults)
+        
+        // Send the tool results back to the model for final response
+        await sendToolResults(toolResultsMessage)
+    }
+    
+    private func createToolResultsMessage(_ results: [ToolCallResult]) -> String {
+        var resultMessage = "Tool execution results:\n\n"
+        
+        for result in results {
+            if let error = result.error {
+                resultMessage += "Tool call failed: \(error)\n"
+            } else {
+                resultMessage += "\(result.result)\n"
+            }
+        }
+        
+        resultMessage += "\nPlease provide a natural response based on these results."
+        return resultMessage
+    }
+    
+    @MainActor
+    private func sendToolResults(_ toolResultsMessage: String) async {
+        guard let conversation = selectedConversation,
+              let model = conversation.model else { return }
+        
+        // Create a tool result message (internal, not displayed to user)
+        let toolMessage = MessageSD(content: toolResultsMessage, role: "user")
+        toolMessage.conversation = conversation
+        
+        // Prepare message history including the tool results
+        var messageHistory = conversation.messages
+            .sorted { $0.createdAt < $1.createdAt }
+            .map { OKChatRequestData.Message(role: OKChatRequestData.Message.Role(rawValue: $0.role) ?? .assistant, content: $0.content) }
+        
+        // Add the tool results message
+        messageHistory.append(OKChatRequestData.Message(role: .user, content: toolResultsMessage))
+        
+        // Create a new assistant message for the final response
+        let finalAssistantMessage = MessageSD(content: "", role: "assistant")
+        finalAssistantMessage.conversation = conversation
+        
+        do {
+            try await swiftDataService.createMessage(finalAssistantMessage)
+            try await reloadConversation(conversation)
+            
+            if await OllamaService.shared.ollamaKit.reachable() {
+                DispatchQueue.global(qos: .background).async {
+                    // Send without tool definitions for the final response
+                    var request = OKChatRequestData(model: model.name, messages: messageHistory)
+                    request.options = OKCompletionOptions(temperature: 0)
+                    
+                    self.generation = OllamaService.shared.ollamaKit.chat(data: request)
+                        .sink(receiveCompletion: { [weak self] completion in
+                            switch completion {
+                            case .finished:
+                                self?.handleComplete()
+                            case .failure(let error):
+                                self?.handleError(error.localizedDescription)
+                            }
+                        }, receiveValue: { [weak self] response in
+                            self?.handleReceive(response)
+                        })
+                }
+            } else {
+                handleError("Server unreachable")
+            }
+        } catch {
+            handleError("Failed to process tool results: \(error.localizedDescription)")
         }
     }
     
