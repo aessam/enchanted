@@ -168,6 +168,11 @@ final class ConversationStore: Sendable {
                     var request = OKChatRequestData(model: model.name, messages: messageHistory)
                     request.options = OKCompletionOptions(temperature: 0)
                     
+                    // Add tools if the model supports them
+                    if model.supportsTools {
+                        request.tools = Tool.availableTools
+                    }
+                    
                     self.generation = OllamaService.shared.ollamaKit.chat(data: request)
                         .sink(receiveCompletion: { [weak self] completion in
                             switch completion {
@@ -190,6 +195,15 @@ final class ConversationStore: Sendable {
     @MainActor
     private func handleReceive(_ response: OKChatResponse)  {
         if messages.isEmpty { return }
+        
+        // Check for tool calls in the response
+        if let toolCalls = response.toolCalls, !toolCalls.isEmpty {
+            // Process tool calls if the message is done
+            if response.done ?? false {
+                guard let lastMessage = messages.last else { return }
+                processToolCallsIfNeeded(lastMessage, toolCalls)
+            }
+        }
         
         if let responseContent = response.message?.content {
             currentMessageBuffer = currentMessageBuffer + responseContent
@@ -230,6 +244,112 @@ final class ConversationStore: Sendable {
         
         withAnimation {
             conversationState = .completed
+        }
+    }
+    
+    // Process any tool calls received from the model
+    private func executeToolCalls(_ toolCalls: [ToolCall]) -> [ToolCallResult] {
+        return toolCalls.map { toolCall in
+            switch toolCall.name {
+            case Tool.timeTools.name:
+                let result = TimeTools.shared.handleTimeToolCall(toolCall.parsedArguments)
+                return ToolCallResult(toolCall: toolCall, response: result)
+                
+            case Tool.dateTools.name:
+                let result = DateTools.shared.handleDateToolCall(toolCall.parsedArguments)
+                return ToolCallResult(toolCall: toolCall, response: result)
+                
+            default:
+                return ToolCallResult(toolCall: toolCall, response: "Error: Unknown tool")
+            }
+        }
+    }
+    
+    // Handle tool calls in the message
+    @MainActor
+    private func processToolCallsIfNeeded(_ message: MessageSD, _ toolCalls: [ToolCall]?) {
+        guard let toolCalls = toolCalls, !toolCalls.isEmpty else { return }
+        
+        message.storeToolCalls(toolCalls)
+        
+        Task {
+            // Execute tool calls
+            let results = executeToolCalls(toolCalls)
+            
+            // Store results in the message
+            message.storeToolResults(results)
+            
+            // Update the message in the database
+            try await self.swiftDataService.updateMessage(message)
+            
+            // Continue the conversation with tool results
+            await continueConversationWithToolResults(message.conversation!, message, results)
+        }
+    }
+    
+    // Continue the conversation by sending tool results back to the model
+    @MainActor
+    private func continueConversationWithToolResults(_ conversation: ConversationSD, _ previousMessage: MessageSD, _ toolResults: [ToolCallResult]) {
+        guard let model = conversation.model, toolResults.count > 0 else { return }
+        
+        // Prepare message history including previous messages and tool results
+        var messageHistory = conversation.messages
+            .sorted{$0.createdAt < $1.createdAt}
+            .filter{$0.id != previousMessage.id} // Filter out the message with pending tool calls
+            .map{OKChatRequestData.Message(role: OKChatRequestData.Message.Role(rawValue: $0.role) ?? .assistant, content: $0.content)}
+        
+        // Add the previous assistant message that contains tool calls
+        messageHistory.append(OKChatRequestData.Message(
+            role: .assistant,
+            content: previousMessage.content
+        ))
+        
+        // Add tool call results
+        for result in toolResults {
+            // Add tool response
+            messageHistory.append(OKChatRequestData.Message(
+                role: .tool,
+                content: result.response,
+                name: result.toolCall.name
+            ))
+        }
+        
+        // Create a new message for the assistant's response
+        let assistantMessage = MessageSD(content: "", role: "assistant")
+        assistantMessage.conversation = conversation
+        
+        conversationState = .loading
+        
+        Task {
+            try await swiftDataService.createMessage(assistantMessage)
+            try await reloadConversation(conversation)
+            
+            if await OllamaService.shared.ollamaKit.reachable() {
+                DispatchQueue.global(qos: .background).async {
+                    // Create request with tool calling enabled
+                    var request = OKChatRequestData(model: model.name, messages: messageHistory)
+                    request.options = OKCompletionOptions(temperature: 0)
+                    
+                    // Add tools if the model supports them
+                    if model.supportsTools {
+                        request.tools = Tool.availableTools
+                    }
+                    
+                    self.generation = OllamaService.shared.ollamaKit.chat(data: request)
+                        .sink(receiveCompletion: { [weak self] completion in
+                            switch completion {
+                            case .finished:
+                                self?.handleComplete()
+                            case .failure(let error):
+                                self?.handleError(error.localizedDescription)
+                            }
+                        }, receiveValue: { [weak self] response in
+                            self?.handleReceive(response)
+                        })
+                }
+            } else {
+                self.handleError("Server unreachable")
+            }
         }
     }
 }

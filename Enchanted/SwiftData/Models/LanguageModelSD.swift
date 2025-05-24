@@ -13,15 +13,17 @@ final class LanguageModelSD: Identifiable {
     @Attribute(.unique) var name: String
     var isAvailable: Bool = false
     var imageSupport: Bool = false
+    var toolSupport: Bool = false
     @Attribute var modelProvider: ModelProvider? = ModelProvider.ollama
     
     @Relationship(deleteRule: .cascade, inverse: \ConversationSD.model)
     var conversations: [ConversationSD]? = []
     
     
-    init(name: String, imageSupport: Bool = false, modelProvider: ModelProvider) {
+    init(name: String, imageSupport: Bool = false, toolSupport: Bool = false, modelProvider: ModelProvider) {
         self.name = name
         self.imageSupport = imageSupport
+        self.toolSupport = toolSupport
         self.modelProvider = modelProvider
     }
     
@@ -58,6 +60,21 @@ extension LanguageModelSD {
         let imageSupportedModels = ["llava"]
         for modelName in imageSupportedModels {
             if name.contains(modelName) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    var supportsTools: Bool {
+        if toolSupport {
+            return true
+        }
+        
+        // Fallback to check known tool-capable models if not explicitly set
+        let toolSupportedModels = ["llama3", "mixtral", "phi3", "gemma"]
+        for modelName in toolSupportedModels {
+            if name.lowercased().contains(modelName) {
                 return true
             }
         }

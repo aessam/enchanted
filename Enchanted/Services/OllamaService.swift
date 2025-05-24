@@ -40,10 +40,20 @@ class OllamaService: @unchecked Sendable {
             LanguageModel(
                 name: $0.name,
                 provider: .ollama,
-                imageSupport: $0.details.families?.contains(where: { $0 == "clip" || $0 == "mllama" }) ?? false
+                imageSupport: $0.details.families?.contains(where: { $0 == "clip" || $0 == "mllama" }) ?? false,
+                // Assuming newer versions of certain models support tool calling
+                toolSupport: isToolSupportedModel($0.name)
             )
         }
         return models
+    }
+    
+    // Helper function to determine if a model likely supports tool calling
+    private func isToolSupportedModel(_ name: String) -> Bool {
+        let toolSupportedModels = ["llama3", "mixtral", "phi3", "gemma"]
+        let lowercaseName = name.lowercased()
+        
+        return toolSupportedModels.contains { lowercaseName.contains($0) }
     }
     
     func reachable() async -> Bool {

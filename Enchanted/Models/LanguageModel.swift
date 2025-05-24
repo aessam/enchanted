@@ -11,6 +11,7 @@ struct LanguageModel {
     var name: String
     var provider: ModelProvider
     var imageSupport: Bool
+    var toolSupport: Bool = false
 }
 
 enum ModelProvider: Codable {
