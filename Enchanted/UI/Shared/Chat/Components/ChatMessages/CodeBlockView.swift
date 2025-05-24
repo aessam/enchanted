@@ -10,6 +10,8 @@ import MarkdownUI
 
 struct CodeBlockView: View {
     var configuration: CodeBlockConfiguration
+    @StateObject private var fontConfigurationStore = FontConfigurationStore.shared
+    
     var language: String {
         let language = configuration.language ?? "code"
         return language != "" ? language : "code"
@@ -19,7 +21,7 @@ struct CodeBlockView: View {
         VStack(spacing: 0) {
             HStack {
                 Text(language)
-                    .font(.system(size: 13, design: .monospaced))
+                    .font(fontConfigurationStore.fontConfiguration.codeFont())
                     .fontWeight(.semibold)
                 Spacer()
                 

@@ -21,6 +21,7 @@ struct InputFieldsView: View {
     @State private var fileDropActive: Bool = false
     @State private var fileSelectingActive: Bool = false
     @FocusState private var isFocusedInput: Bool
+    @StateObject private var fontConfigurationStore = FontConfigurationStore.shared
     
     @MainActor private func sendMessage() {
         guard let selectedModel = selectedModel else { return }
@@ -71,7 +72,7 @@ struct InputFieldsView: View {
             ZStack(alignment: .trailing) {
                 TextField("Message", text: $message.animation(.easeOut(duration: 0.3)), axis: .vertical)
                     .focused($isFocusedInput)
-                    .font(.system(size: 14))
+                    .font(fontConfigurationStore.fontConfiguration.chatInputFont())
                     .frame(maxWidth:.infinity, minHeight: 40)
                     .clipped()
                     .textFieldStyle(.plain)

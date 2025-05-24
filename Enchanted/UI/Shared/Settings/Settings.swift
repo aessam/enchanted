@@ -12,6 +12,7 @@ struct Settings: View {
     var languageModelStore = LanguageModelStore.shared
     var conversationStore = ConversationStore.shared
     var swiftDataService = SwiftDataService.shared
+    var fontConfigurationStore = FontConfigurationStore.shared
     
     @AppStorage("ollamaUri") private var ollamaUri: String = ""
     @AppStorage("systemPrompt") private var systemPrompt: String = ""
@@ -22,6 +23,7 @@ struct Settings: View {
     @AppStorage("appUserInitials") private var appUserInitials: String = ""
     @AppStorage("pingInterval") private var pingInterval: String = "5"
     @AppStorage("voiceIdentifier") private var voiceIdentifier: String = ""
+    @AppStorage("fontSizeCategory") private var fontSizeCategory: String = FontSizeCategory.medium.rawValue
     
     @StateObject private var speechSynthesiser = SpeechSynthesizer.shared
     
@@ -73,6 +75,7 @@ struct Settings: View {
             appUserInitials: $appUserInitials,
             pingInterval: $pingInterval,
             voiceIdentifier: $voiceIdentifier,
+            fontSizeCategory: $fontSizeCategory,
             save: save,
             checkServer: checkServer,
             deleteAll: deleteAll,
@@ -85,6 +88,11 @@ struct Settings: View {
         #endif
         .onChange(of: defaultOllamaModel) { _, modelName in
             languageModelStore.setModel(modelName: modelName)
+        }
+        .onChange(of: fontSizeCategory) { _, newCategory in
+            if let category = FontSizeCategory(rawValue: newCategory) {
+                fontConfigurationStore.updateFontSize(category: category)
+            }
         }
         .onAppear {
             /// refresh voices in the background

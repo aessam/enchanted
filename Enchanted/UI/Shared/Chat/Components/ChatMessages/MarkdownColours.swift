@@ -36,10 +36,11 @@ struct MarkdownColours {
     static let checkbox = Color(rgba: 0xb9b9_bbff)
     static let checkboxBackground = Color(rgba: 0xeeee_efff)
     
-    static let enchantedTheme = Theme()
-        .text {
-            FontSize(14)
-        }
+    static func enchantedTheme(fontSize: CGFloat = 14) -> Theme {
+        return Theme()
+            .text {
+                FontSize(fontSize)
+            }
         .code {
             FontFamilyVariant(.monospaced)
             FontSize(.em(0.85))
@@ -172,4 +173,5 @@ struct MarkdownColours {
                 .overlay(border)
                 .markdownMargin(top: 24, bottom: 24)
         }
+    }
 }

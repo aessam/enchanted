@@ -13,6 +13,7 @@ import Splash
 struct ChatMessageView: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var speechSynthesizer = SpeechSynthesizer.shared
+    @StateObject private var fontConfigurationStore = FontConfigurationStore.shared
     var message: MessageSD
     var showLoader: Bool = false
     var userInitials: String
@@ -73,7 +74,7 @@ struct ChatMessageView: View {
                                         .textSelection(.enabled)
 #endif
                                         .markdownCodeSyntaxHighlighter(.splash(theme: codeHighlightColorScheme))
-                                        .markdownTheme(MarkdownColours.enchantedTheme)
+                                        .markdownTheme(MarkdownColours.enchantedTheme(fontSize: fontConfigurationStore.fontConfiguration.markdownBaseSize))
                                 }
                             } else {
                                 if message.thinkComplete {
@@ -94,7 +95,7 @@ struct ChatMessageView: View {
                             .textSelection(.enabled)
     #endif
                             .markdownCodeSyntaxHighlighter(.splash(theme: codeHighlightColorScheme))
-                            .markdownTheme(MarkdownColours.enchantedTheme)
+                            .markdownTheme(MarkdownColours.enchantedTheme(fontSize: fontConfigurationStore.fontConfiguration.markdownBaseSize))
                     }
                     
                     if let uiImage = image {
