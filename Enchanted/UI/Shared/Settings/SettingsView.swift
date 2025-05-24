@@ -19,6 +19,7 @@ struct SettingsView: View {
     @Binding var appUserInitials: String
     @Binding var pingInterval: String
     @Binding var voiceIdentifier: String
+    @Binding var fontSizeCategory: String
     @State var ollamaStatus: Bool?
     var save: () -> ()
     var checkServer: () -> ()
@@ -27,6 +28,7 @@ struct SettingsView: View {
     var voices: [AVSpeechSynthesisVoice]
     
     @State private var deleteConversationsDialog = false
+    @StateObject private var fontConfigurationStore = FontConfigurationStore.shared
     
     var body: some View {
         VStack {
@@ -36,7 +38,7 @@ struct SettingsView: View {
                         presentationMode.wrappedValue.dismiss()
                     } label: {
                         Text("Cancel")
-                            .font(.system(size: 16))
+                            .font(fontConfigurationStore.fontConfiguration.mediumUIFont())
                             .foregroundStyle(Color(.label))
                     }
                     
@@ -45,7 +47,7 @@ struct SettingsView: View {
                     
                     Button(action: save) {
                         Text("Save")
-                            .font(.system(size: 16))
+                            .font(fontConfigurationStore.fontConfiguration.mediumUIFont())
                             .foregroundStyle(Color(.label))
                     }
                 }
@@ -53,7 +55,7 @@ struct SettingsView: View {
                 HStack {
                     Spacer()
                     Text("Settings")
-                        .font(.system(size: 16))
+                        .font(fontConfigurationStore.fontConfiguration.mediumUIFont())
                         .fontWeight(.medium)
                         .foregroundStyle(Color(.label))
                     Spacer()
@@ -77,7 +79,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading) {
                         Text("System prompt")
                         TextEditor(text: $systemPrompt)
-                            .font(.system(size: 13))
+                            .font(fontConfigurationStore.fontConfiguration.systemPromptFont())
                             .cornerRadius(4)
                             .multilineTextAlignment(.leading)
                             .frame(minHeight: 100)
@@ -128,6 +130,15 @@ struct SettingsView: View {
                         }
                     } label: {
                         Label("Appearance", systemImage: "sun.max")
+                            .foregroundStyle(Color.label)
+                    }
+                    
+                    Picker(selection: $fontSizeCategory) {
+                        ForEach(FontSizeCategory.allCases, id:\.self) { category in
+                            Text(category.displayName).tag(category.rawValue)
+                        }
+                    } label: {
+                        Label("Font Size", systemImage: "textformat.size")
                             .foregroundStyle(Color.label)
                     }
                     
@@ -209,6 +220,7 @@ struct SettingsView: View {
         appUserInitials: .constant("AM"),
         pingInterval: .constant("5"),
         voiceIdentifier: .constant("sample"),
+        fontSizeCategory: .constant(FontSizeCategory.medium.rawValue),
         save: {},
         checkServer: {},
         deleteAll: {},
