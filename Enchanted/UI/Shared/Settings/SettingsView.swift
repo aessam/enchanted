@@ -19,6 +19,7 @@ struct SettingsView: View {
     @Binding var appUserInitials: String
     @Binding var pingInterval: String
     @Binding var voiceIdentifier: String
+    @Binding var toolCallingEnabled: Bool
     @State var ollamaStatus: Bool?
     var save: () -> ()
     var checkServer: () -> ()
@@ -112,6 +113,11 @@ struct SettingsView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     
                     Section(header: Text("APP").font(.headline).padding(.top, 20)) {
+                        
+                        Toggle(isOn: $toolCallingEnabled, label: {
+                            Label("Tool Calling", systemImage: "wrench.and.screwdriver")
+                                .foregroundStyle(Color.label)
+                        })
                         
 #if os(iOS)
                         Toggle(isOn: $vibrations, label: {

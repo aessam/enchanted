@@ -7,6 +7,7 @@
 
 import Foundation
 import OllamaKit
+import Combine
 
 class OllamaService: @unchecked Sendable {
     static let shared = OllamaService()
@@ -48,5 +49,89 @@ class OllamaService: @unchecked Sendable {
     
     func reachable() async -> Bool {
         return await ollamaKit.reachable()
+    }
+    
+    // MARK: - Tool Calling Support
+    
+    func chatWithTools(
+        model: String,
+        messages: [OKChatRequestData.Message],
+        tools: [ToolDefinition],
+        temperature: Double = 0
+    ) -> AnyPublisher<OKChatResponse, Error> {
+        
+        // Create a custom request structure that includes tools
+        var request = OKChatRequestData(model: model, messages: messages)
+        request.options = OKCompletionOptions(temperature: temperature)
+        
+        // Since OllamaKit might not support tools directly, we'll add tool definitions
+        // to the system message to enable function calling via prompt engineering
+        let toolsPrompt = createToolsSystemPrompt(tools: tools)
+        
+        // Prepend tools prompt to system message or create new system message
+        var modifiedMessages = messages
+        if let firstMessage = modifiedMessages.first, firstMessage.role == .system {
+            // Append to existing system message
+            let combinedContent = "\(firstMessage.content)\n\n\(toolsPrompt)"
+            modifiedMessages[0] = OKChatRequestData.Message(
+                role: .system,
+                content: combinedContent,
+                images: firstMessage.images
+            )
+        } else {
+            // Insert new system message at the beginning
+            modifiedMessages.insert(
+                OKChatRequestData.Message(role: .system, content: toolsPrompt),
+                at: 0
+            )
+        }
+        
+        let toolRequest = OKChatRequestData(model: model, messages: modifiedMessages)
+        var options = OKCompletionOptions()
+        options.temperature = temperature
+        toolRequest.options = options
+        
+        return ollamaKit.chat(data: toolRequest)
+    }
+    
+    private func createToolsSystemPrompt(tools: [ToolDefinition]) -> String {
+        let toolsJson = tools.map { tool in
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            if let data = try? encoder.encode(tool),
+               let jsonString = String(data: data, encoding: .utf8) {
+                return jsonString
+            }
+            return ""
+        }.joined(separator: ",\n")
+        
+        return """
+        You are an AI assistant with access to the following tools. When you need to call a function, respond with a JSON object in this exact format:
+
+        ```json
+        {
+          "tool_calls": [
+            {
+              "id": "call_123",
+              "type": "function",
+              "function": {
+                "name": "function_name",
+                "arguments": "{\"param1\": \"value1\"}"
+              }
+            }
+          ]
+        }
+        ```
+
+        Available tools:
+        [\(toolsJson)]
+
+        Important:
+        - Only use these tools when the user asks for time/date information
+        - Always provide a unique ID for each tool call (e.g., "call_1", "call_2", etc.)
+        - Arguments must be a JSON string, not a JSON object
+        - After receiving tool results, respond naturally with the information
+        - If you don't need to call any tools, respond normally without the JSON structure
+        """
     }
 }

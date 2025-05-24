@@ -22,6 +22,7 @@ struct Settings: View {
     @AppStorage("appUserInitials") private var appUserInitials: String = ""
     @AppStorage("pingInterval") private var pingInterval: String = "5"
     @AppStorage("voiceIdentifier") private var voiceIdentifier: String = ""
+    @AppStorage("toolCallingEnabled") private var toolCallingEnabled: Bool = true
     
     @StateObject private var speechSynthesiser = SpeechSynthesizer.shared
     
@@ -39,6 +40,10 @@ struct Settings: View {
         }
         
         OllamaService.shared.initEndpoint(url: ollamaUri, bearerToken: ollamaBearerToken)
+        
+        // Update tool calling setting
+        await conversationStore.toggleToolCalling(toolCallingEnabled)
+        
         Task {
             Haptics.shared.mediumTap()
             try? await languageModelStore.loadModels()
@@ -73,6 +78,7 @@ struct Settings: View {
             appUserInitials: $appUserInitials,
             pingInterval: $pingInterval,
             voiceIdentifier: $voiceIdentifier,
+            toolCallingEnabled: $toolCallingEnabled,
             save: save,
             checkServer: checkServer,
             deleteAll: deleteAll,
