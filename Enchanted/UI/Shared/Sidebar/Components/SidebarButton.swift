@@ -22,7 +22,7 @@ struct SidebarButton: View {
                 
                 Text(title)
                     .lineLimit(1)
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
                     .fontWeight(.regular)
                 
                 Spacer()

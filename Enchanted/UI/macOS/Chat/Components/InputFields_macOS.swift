@@ -71,7 +71,7 @@ struct InputFieldsView: View {
             ZStack(alignment: .trailing) {
                 TextField("Message", text: $message.animation(.easeOut(duration: 0.3)), axis: .vertical)
                     .focused($isFocusedInput)
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
                     .frame(maxWidth:.infinity, minHeight: 40)
                     .clipped()
                     .textFieldStyle(.plain)

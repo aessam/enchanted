@@ -17,6 +17,7 @@ struct Settings: View {
     @AppStorage("systemPrompt") private var systemPrompt: String = ""
     @AppStorage("vibrations") private var vibrations: Bool = true
     @AppStorage("colorScheme") private var colorScheme = AppColorScheme.system
+    @AppStorage("fontSize") private var fontSize: AppFontSize = .normal
     @AppStorage("defaultOllamaModel") private var defaultOllamaModel: String = ""
     @AppStorage("ollamaBearerToken") private var ollamaBearerToken: String = ""
     @AppStorage("appUserInitials") private var appUserInitials: String = ""
@@ -68,7 +69,8 @@ struct Settings: View {
             systemPrompt: $systemPrompt, 
             vibrations: $vibrations,
             colorScheme: $colorScheme,
-            defaultOllamModel: $defaultOllamaModel, 
+            fontSize: $fontSize,
+            defaultOllamModel: $defaultOllamaModel,
             ollamaBearerToken: $ollamaBearerToken,
             appUserInitials: $appUserInitials,
             pingInterval: $pingInterval,

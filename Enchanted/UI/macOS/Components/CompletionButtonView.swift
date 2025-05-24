@@ -20,10 +20,10 @@ struct CompletionButtonView: View {
                     .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(5)
-                    .font(.system(size: 10, weight: .medium, design: .default))
+                    .scaledFont(size: 10, weight: .medium)
                 
                 Text(name)
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
             }
             .padding(.vertical, 4)
             .padding(.horizontal, 8)

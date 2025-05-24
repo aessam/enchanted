@@ -10,6 +10,7 @@ import SwiftData
 
 struct ApplicationEntry: View {
     @AppStorage("colorScheme") private var colorScheme: AppColorScheme = .system
+    @AppStorage("fontSize") private var fontSize: AppFontSize = .normal
     @State private var languageModelStore = LanguageModelStore.shared
     @State private var conversationStore = ConversationStore.shared
     @State private var completionsStore = CompletionsStore.shared
@@ -47,6 +48,7 @@ struct ApplicationEntry: View {
             }
         }
         .preferredColorScheme(colorScheme.toiOSFormat)
+        .environment(\.fontScale, fontSize.scale)
     }
 }
 

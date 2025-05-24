@@ -19,6 +19,7 @@ struct SettingsView: View {
     @Binding var appUserInitials: String
     @Binding var pingInterval: String
     @Binding var voiceIdentifier: String
+    @Binding var fontSize: AppFontSize
     @State var ollamaStatus: Bool?
     var save: () -> ()
     var checkServer: () -> ()
@@ -36,7 +37,7 @@ struct SettingsView: View {
                         presentationMode.wrappedValue.dismiss()
                     } label: {
                         Text("Cancel")
-                            .font(.system(size: 16))
+                            .scaledFont(size: 16)
                             .foregroundStyle(Color(.label))
                     }
                     
@@ -45,7 +46,7 @@ struct SettingsView: View {
                     
                     Button(action: save) {
                         Text("Save")
-                            .font(.system(size: 16))
+                            .scaledFont(size: 16)
                             .foregroundStyle(Color(.label))
                     }
                 }
@@ -53,7 +54,7 @@ struct SettingsView: View {
                 HStack {
                     Spacer()
                     Text("Settings")
-                        .font(.system(size: 16))
+                        .scaledFont(size: 16)
                         .fontWeight(.medium)
                         .foregroundStyle(Color(.label))
                     Spacer()
@@ -77,7 +78,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading) {
                         Text("System prompt")
                         TextEditor(text: $systemPrompt)
-                            .font(.system(size: 13))
+                            .scaledFont(size: 13)
                             .cornerRadius(4)
                             .multilineTextAlignment(.leading)
                             .frame(minHeight: 100)
@@ -128,6 +129,15 @@ struct SettingsView: View {
                         }
                     } label: {
                         Label("Appearance", systemImage: "sun.max")
+                            .foregroundStyle(Color.label)
+                    }
+
+                    Picker(selection: $fontSize) {
+                        ForEach(AppFontSize.allCases, id:\.self) { size in
+                            Text(size.toString).tag(size)
+                        }
+                    } label: {
+                        Label("Font Size", systemImage: "textformat.size")
                             .foregroundStyle(Color.label)
                     }
                     
@@ -209,6 +219,7 @@ struct SettingsView: View {
         appUserInitials: .constant("AM"),
         pingInterval: .constant("5"),
         voiceIdentifier: .constant("sample"),
+        fontSize: .constant(.normal),
         save: {},
         checkServer: {},
         deleteAll: {},

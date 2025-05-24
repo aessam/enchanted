@@ -75,7 +75,7 @@ struct PanelCompletionsView: View {
                     .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(5)
-                    .font(.system(size: 10, weight: .medium, design: .default))
+                    .scaledFont(size: 10, weight: .medium)
                 
                 Text("Your Command")
                     .enchantify()
@@ -103,7 +103,7 @@ struct PanelCompletionsView: View {
                     .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(5)
-                    .font(.system(size: 10, weight: .medium, design: .default))
+                    .scaledFont(size: 10, weight: .medium)
             }
             .buttonStyle(GrowingButton())
             .keyboardShortcut(.tab, modifiers: [])
