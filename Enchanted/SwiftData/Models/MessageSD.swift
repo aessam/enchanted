@@ -57,20 +57,77 @@ final class MessageSD: Identifiable {
     var createdAt: Date = Date.now
     @Attribute(.externalStorage) var image: Data?
     
+    // Tool call properties
+    @Attribute(.externalStorage) var toolCalls: Data?
+    @Attribute(.externalStorage) var toolResults: Data?
+    
     @Relationship var conversation: ConversationSD?
         
     
-    init(content: String, role: String, done: Bool = false, error: Bool = false, image: Data? = nil) {
+    init(content: String, role: String, done: Bool = false, error: Bool = false, image: Data? = nil, toolCalls: Data? = nil, toolResults: Data? = nil) {
         self.content = content
         self.role = role
         self.done = done
         self.error = error
         self.conversation = conversation
         self.image = image
+        self.toolCalls = toolCalls
+        self.toolResults = toolResults
     }
 
     @Transient var model: String {
         conversation?.model?.name ?? ""
+    }
+    
+    // Tool call utilities
+    @Transient var hasToolCalls: Bool {
+        toolCalls != nil
+    }
+    
+    @Transient var hasToolResults: Bool {
+        toolResults != nil
+    }
+    
+    // Decode tool calls from Data
+    @Transient var decodedToolCalls: [ToolCall]? {
+        guard let toolCalls = toolCalls else { return nil }
+        
+        do {
+            return try JSONDecoder().decode([ToolCall].self, from: toolCalls)
+        } catch {
+            print("Error decoding tool calls: \(error)")
+            return nil
+        }
+    }
+    
+    // Decode tool results from Data
+    @Transient var decodedToolResults: [ToolCallResult]? {
+        guard let toolResults = toolResults else { return nil }
+        
+        do {
+            return try JSONDecoder().decode([ToolCallResult].self, from: toolResults)
+        } catch {
+            print("Error decoding tool results: \(error)")
+            return nil
+        }
+    }
+    
+    // Encode and store tool calls
+    func storeToolCalls(_ calls: [ToolCall]) {
+        do {
+            self.toolCalls = try JSONEncoder().encode(calls)
+        } catch {
+            print("Error encoding tool calls: \(error)")
+        }
+    }
+    
+    // Encode and store tool results
+    func storeToolResults(_ results: [ToolCallResult]) {
+        do {
+            self.toolResults = try JSONEncoder().encode(results)
+        } catch {
+            print("Error encoding tool results: \(error)")
+        }
     }
 }
 
