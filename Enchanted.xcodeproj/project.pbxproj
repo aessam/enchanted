@@ -84,9 +84,10 @@
 		FFBBF4842B34881B008D611C /* SpeechRecogniser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBBF4832B34881B008D611C /* SpeechRecogniser.swift */; };
 		FFBBF4882B34F9C8008D611C /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBBF4872B34F9C8008D611C /* View+Extension.swift */; };
 		FFBBF48A2B350283008D611C /* SelectedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBBF4892B350283008D611C /* SelectedImageView.swift */; };
-		FFBBF48C2B35051D008D611C /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBBF48B2B35051D008D611C /* UIImage+Extension.swift */; };
-		FFCF00F12C03209A00590E79 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCF00F02C03209A00590E79 /* SpeechService.swift */; };
-		FFD57E302BF29145003FEFF1 /* MarkdownColours.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD57E2F2BF29145003FEFF1 /* MarkdownColours.swift */; };
+                FFBBF48C2B35051D008D611C /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBBF48B2B35051D008D611C /* UIImage+Extension.swift */; };
+                FFCF00F12C03209A00590E79 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCF00F02C03209A00590E79 /* SpeechService.swift */; };
+                B3A7EAF61F0D426E8BC6B22F /* ToolsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5F9E5DCE94414BA29149B4 /* ToolsService.swift */; };
+                FFD57E302BF29145003FEFF1 /* MarkdownColours.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD57E2F2BF29145003FEFF1 /* MarkdownColours.swift */; };
 		FFD57E322BF291B2003FEFF1 /* CodeBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD57E312BF291B2003FEFF1 /* CodeBlockView.swift */; };
 		FFD5FAD22B8130490055AB51 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = FF464B122B8026DA008E5130 /* Vortex */; };
 		FFD5FAD52B8130CE0055AB51 /* OllamaKit in Frameworks */ = {isa = PBXBuildFile; productRef = FFD5FAD42B8130CE0055AB51 /* OllamaKit */; };
@@ -180,8 +181,9 @@
 		FFBBF4872B34F9C8008D611C /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		FFBBF4892B350283008D611C /* SelectedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedImageView.swift; sourceTree = "<group>"; };
 		FFBBF48B2B35051D008D611C /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
-		FFCF00F02C03209A00590E79 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
-		FFD57E2F2BF29145003FEFF1 /* MarkdownColours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownColours.swift; sourceTree = "<group>"; };
+                FFCF00F02C03209A00590E79 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+                BC5F9E5DCE94414BA29149B4 /* ToolsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsService.swift; sourceTree = "<group>"; };
+                FFD57E2F2BF29145003FEFF1 /* MarkdownColours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownColours.swift; sourceTree = "<group>"; };
 		FFD57E312BF291B2003FEFF1 /* CodeBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeBlockView.swift; sourceTree = "<group>"; };
 		FFE21C772B82353A00A69B9C /* SleepTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTest.swift; sourceTree = "<group>"; };
 		FFE2C8222B9A657A00BD82F3 /* Accessibility.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Accessibility.plist; sourceTree = "<group>"; };
@@ -522,15 +524,16 @@
 			children = (
 				FF2F03412B795E0B00349855 /* Clipboard.swift */,
 				FF0146CC2B3DADCA00A2A9F6 /* HapticsService.swift */,
-				FF2F03482B796A6500349855 /* HotkeyService.swift */,
-				FF10023D2B24F4900011A4DC /* OllamaService.swift */,
-				FF10024F2B25C79F0011A4DC /* SwiftDataService.swift */,
-				FF6B7B122B3EE7AC00E8FEA3 /* Throttler.swift */,
-				FFCF00F02C03209A00590E79 /* SpeechService.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
+                               FF2F03482B796A6500349855 /* HotkeyService.swift */,
+                               FF10023D2B24F4900011A4DC /* OllamaService.swift */,
+                               FF10024F2B25C79F0011A4DC /* SwiftDataService.swift */,
+                               FF6B7B122B3EE7AC00E8FEA3 /* Throttler.swift */,
+                               FFCF00F02C03209A00590E79 /* SpeechService.swift */,
+                                BC5F9E5DCE94414BA29149B4 /* ToolsService.swift */,
+                       );
+                       path = Services;
+                       sourceTree = "<group>";
+               };
 		FFEC32A52B247879003E5C04 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -662,9 +665,10 @@
 				FF15EF6A2B826C0300D4A541 /* SimpleFloatingButton.swift in Sources */,
 				FF24B30E2B66BE8500AB618F /* RunningBorder.swift in Sources */,
 				FF1002602B26499B0011A4DC /* ConversationStatusView.swift in Sources */,
-				FF10024C2B25BEA00011A4DC /* MessageSD.swift in Sources */,
-				FFCF00F12C03209A00590E79 /* SpeechService.swift in Sources */,
-				FF10023E2B24F4900011A4DC /* OllamaService.swift in Sources */,
+                                FF10024C2B25BEA00011A4DC /* MessageSD.swift in Sources */,
+                                FFCF00F12C03209A00590E79 /* SpeechService.swift in Sources */,
+                                B3A7EAF61F0D426E8BC6B22F /* ToolsService.swift in Sources */,
+                                FF10023E2B24F4900011A4DC /* OllamaService.swift in Sources */,
 				FFBBF48C2B35051D008D611C /* UIImage+Extension.swift in Sources */,
 				FF1002302B2482BA0011A4DC /* ChatMessageView.swift in Sources */,
 				FF1002322B2483A20011A4DC /* Colours+Extension.swift in Sources */,

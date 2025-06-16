@@ -223,13 +223,36 @@ final class ConversationStore: Sendable {
         guard let lastMesasge = messages.last else { return }
         lastMesasge.error = false
         lastMesasge.done = true
-        
+
         Task(priority: .background) {
             try await self.swiftDataService.updateMessage(lastMesasge)
         }
-        
+
+        Task {
+            await detectToolCallIfNeeded(content: lastMesasge.content)
+        }
+
         withAnimation {
             conversationState = .completed
+        }
+    }
+
+    private func detectToolCallIfNeeded(content: String) async {
+        guard let data = content.data(using: .utf8),
+              let toolCall = try? JSONDecoder().decode(ToolCall.self, from: data) else { return }
+
+        let result = (try? await ToolsService.shared.handle(toolCall: toolCall)) ?? ""
+
+        await MainActor.run {
+            guard let conversation = selectedConversation else { return }
+            let toolMessage = MessageSD(content: result, role: "assistant")
+            toolMessage.conversation = conversation
+            messages.append(toolMessage)
+            conversationState = .completed
+
+            Task(priority: .background) {
+                try? await swiftDataService.createMessage(toolMessage)
+            }
         }
     }
 }
