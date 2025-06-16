@@ -101,8 +101,12 @@
 		FFEC9BE12B81327B00AFBA63 /* DragAndDrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEC9BE02B81327B00AFBA63 /* DragAndDrop.swift */; };
 		FFEC9BE32B81358800AFBA63 /* DeallocPrinter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEC9BE22B81358800AFBA63 /* DeallocPrinter.swift */; };
 		FFEC9BE72B813A8D00AFBA63 /* RemovableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEC9BE62B813A8D00AFBA63 /* RemovableImage.swift */; };
-		FFFD00C22B92607800392AE6 /* CompletionsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFD00C12B92607800392AE6 /* CompletionsStore.swift */; };
-		FFFD00C92B94CB5E00392AE6 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = FFFD00C82B94CB5E00392AE6 /* AsyncAlgorithms */; };
+                FFFD00C22B92607800392AE6 /* CompletionsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFD00C12B92607800392AE6 /* CompletionsStore.swift */; };
+                FFFD00C92B94CB5E00392AE6 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = FFFD00C82B94CB5E00392AE6 /* AsyncAlgorithms */; };
+                FFE001A02D5C00010011A4DC /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE001A12D5C00010011A4DC /* SearchService.swift */; };
+                FFE001A22D5C00010011A4DC /* WebScraperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE001A32D5C00010011A4DC /* WebScraperService.swift */; };
+                FFE001A42D5C00010011A4DC /* DateTimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE001A52D5C00010011A4DC /* DateTimeService.swift */; };
+                FFE001A62D5C00010011A4DC /* ToolService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE001A72D5C00010011A4DC /* ToolService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -196,7 +200,11 @@
 		FFEC9BE02B81327B00AFBA63 /* DragAndDrop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DragAndDrop.swift; sourceTree = "<group>"; };
 		FFEC9BE22B81358800AFBA63 /* DeallocPrinter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeallocPrinter.swift; sourceTree = "<group>"; };
 		FFEC9BE62B813A8D00AFBA63 /* RemovableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovableImage.swift; sourceTree = "<group>"; };
-		FFFD00C12B92607800392AE6 /* CompletionsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionsStore.swift; sourceTree = "<group>"; };
+                FFFD00C12B92607800392AE6 /* CompletionsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionsStore.swift; sourceTree = "<group>"; };
+                FFE001A12D5C00010011A4DC /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
+                FFE001A32D5C00010011A4DC /* WebScraperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebScraperService.swift; sourceTree = "<group>"; };
+                FFE001A52D5C00010011A4DC /* DateTimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimeService.swift; sourceTree = "<group>"; };
+                FFE001A72D5C00010011A4DC /* ToolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -525,11 +533,15 @@
 				FF2F03482B796A6500349855 /* HotkeyService.swift */,
 				FF10023D2B24F4900011A4DC /* OllamaService.swift */,
 				FF10024F2B25C79F0011A4DC /* SwiftDataService.swift */,
-				FF6B7B122B3EE7AC00E8FEA3 /* Throttler.swift */,
-				FFCF00F02C03209A00590E79 /* SpeechService.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
+                               FF6B7B122B3EE7AC00E8FEA3 /* Throttler.swift */,
+                               FFCF00F02C03209A00590E79 /* SpeechService.swift */,
+                                FFE001A12D5C00010011A4DC /* SearchService.swift */,
+                                FFE001A32D5C00010011A4DC /* WebScraperService.swift */,
+                                FFE001A52D5C00010011A4DC /* DateTimeService.swift */,
+                                FFE001A72D5C00010011A4DC /* ToolService.swift */,
+                       );
+                       path = Services;
+                       sourceTree = "<group>";
 		};
 		FFEC32A52B247879003E5C04 /* UI */ = {
 			isa = PBXGroup;
@@ -739,9 +751,13 @@
 				FF1002752B278C170011A4DC /* AppStore.swift in Sources */,
 				FF1002732B276EC10011A4DC /* AppColorScheme.swift in Sources */,
 				FF10025E2B2648460011A4DC /* ConversationState.swift in Sources */,
-				FFEC9BE72B813A8D00AFBA63 /* RemovableImage.swift in Sources */,
-				FFFD00C22B92607800392AE6 /* CompletionsStore.swift in Sources */,
-			);
+                                FFEC9BE72B813A8D00AFBA63 /* RemovableImage.swift in Sources */,
+                                FFFD00C22B92607800392AE6 /* CompletionsStore.swift in Sources */,
+                                FFE001A02D5C00010011A4DC /* SearchService.swift in Sources */,
+                                FFE001A22D5C00010011A4DC /* WebScraperService.swift in Sources */,
+                                FFE001A42D5C00010011A4DC /* DateTimeService.swift in Sources */,
+                                FFE001A62D5C00010011A4DC /* ToolService.swift in Sources */,
+                        );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
