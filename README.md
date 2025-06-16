@@ -91,6 +91,7 @@ Conversation history
 - Edit message content or submit message with different model
 - Delete single conversation / delete all conversations
 - macOS Spotlight panel <kbd>Ctrl</kbd>+<kbd>⌘</kbd>+<kbd>K</kbd>
+- Tool calling with built-in search, web scraping and date/time utilities
 - All features works offline
 
 ## Usage instructions
