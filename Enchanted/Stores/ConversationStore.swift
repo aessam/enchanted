@@ -109,6 +109,35 @@ final class ConversationStore: Sendable {
     @MainActor
     func sendPrompt(userPrompt: String, model: LanguageModelSD, image: Image? = nil, systemPrompt: String = "", trimmingMessageId: String? = nil) {
         guard userPrompt.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 else { return }
+
+        if let command = ToolService.shared.parse(userPrompt) {
+            let conversation = selectedConversation ?? ConversationSD(name: userPrompt)
+            conversation.updatedAt = Date.now
+            conversation.model = model
+
+            let userMessage = MessageSD(content: userPrompt, role: "user", image: image?.render()?.compressImageData())
+            userMessage.conversation = conversation
+
+            conversationState = .loading
+
+            Task {
+                let result = await ToolService.shared.run(command: command)
+                let assistantMessage = MessageSD(content: result, role: "assistant", done: true)
+                assistantMessage.conversation = conversation
+
+                try await swiftDataService.updateConversation(conversation)
+                try await swiftDataService.createMessage(userMessage)
+                try await swiftDataService.createMessage(assistantMessage)
+                try await reloadConversation(conversation)
+                try? await loadConversations()
+
+                withAnimation {
+                    conversationState = .completed
+                }
+            }
+
+            return
+        }
         
         let conversation = selectedConversation ?? ConversationSD(name: userPrompt)
         conversation.updatedAt = Date.now
